@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Real-time Chat App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container">
+      <a class="navbar-brand" href="#">Admin Panel</a>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="index.html">Back to Chat</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Real-time Chat Admin Panel</h1>
+
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="rooms-tab" data-bs-toggle="tab" data-bs-target="#rooms" type="button" role="tab">Rooms</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="friends-tab" data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab">Friends</button>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-4" id="adminTabsContent">
+      <div class="tab-pane fade show active" id="rooms" role="tabpanel">
+        <h3>Rooms Management</h3>
+        <div id="roomsTable">
+          <!-- Rooms will be loaded here -->
+        </div>
+      </div>
+      <div class="tab-pane fade" id="friends" role="tabpanel">
+        <h3>Friends Management</h3>
+        <div id="friendsTable">
+          <!-- Friends will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

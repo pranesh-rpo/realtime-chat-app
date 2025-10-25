@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Barcelona Home Jersey",
+    "price": 89.99,
+    "image": "https://source.unsplash.com/300x400/?barcelona-jersey",
+    "description": "Official Barcelona home jersey for the 2023 season."
+  },
+  {
+    "id": 2,
+    "name": "Real Madrid Away Jersey",
+    "price": 99.99,
+    "image": "https://source.unsplash.com/300x400/?real-madrid-jersey",
+    "description": "Stunning Real Madrid away jersey with premium quality."
+  },
+  {
+    "id": 3,
+    "name": "Manchester United Third Jersey",
+    "price": 79.99,
+    "image": "https://source.unsplash.com/300x400/?manchester-united-jersey",
+    "description": "Limited edition Manchester United third jersey."
+  }
+]
