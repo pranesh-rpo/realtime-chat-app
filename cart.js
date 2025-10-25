@@ -1,78 +1,63 @@
 const db = require('./db');
 
 function addToCart(userId, jerseyId, quantity = 1) {
-  return new Promise((resolve, reject) => {
+  try {
     // Check if item already in cart
-    db.get("SELECT * FROM carts WHERE user_id = ? AND jersey_id = ?", [userId, jerseyId], (err, row) => {
-      if (err) {
-        reject(err);
-      } else if (row) {
-        // Update quantity
-        db.run("UPDATE carts SET quantity = quantity + ? WHERE id = ?", [quantity, row.id], function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ id: row.id, user_id: userId, jersey_id: jerseyId, quantity: row.quantity + quantity });
-          }
-        });
-      } else {
-        // Insert new item
-        db.run("INSERT INTO carts (user_id, jersey_id, quantity) VALUES (?, ?, ?)", [userId, jerseyId, quantity], function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ id: this.lastID, user_id: userId, jersey_id: jerseyId, quantity });
-          }
-        });
-      }
-    });
-  });
+    const selectStmt = db.prepare("SELECT * FROM carts WHERE user_id = ? AND jersey_id = ?");
+    const row = selectStmt.get(userId, jerseyId);
+
+    if (row) {
+      // Update quantity
+      const updateStmt = db.prepare("UPDATE carts SET quantity = quantity + ? WHERE id = ?");
+      updateStmt.run(quantity, row.id);
+      return { id: row.id, user_id: userId, jersey_id: jerseyId, quantity: row.quantity + quantity };
+    } else {
+      // Insert new item
+      const insertStmt = db.prepare("INSERT INTO carts (user_id, jersey_id, quantity) VALUES (?, ?, ?)");
+      const result = insertStmt.run(userId, jerseyId, quantity);
+      return { id: result.lastInsertRowid, user_id: userId, jersey_id: jerseyId, quantity };
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 function getCart(userId) {
-  return new Promise((resolve, reject) => {
-    const query = `
+  try {
+    const stmt = db.prepare(`
       SELECT c.id, c.quantity, c.added_at, j.id as jersey_id, j.name, j.price, j.image, j.description
       FROM carts c
       JOIN jerseys j ON c.jersey_id = j.id
       WHERE c.user_id = ?
-    `;
-    db.all(query, [userId], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+    `);
+    return stmt.all(userId);
+  } catch (error) {
+    throw error;
+  }
 }
 
 function removeFromCart(cartId, userId) {
-  return new Promise((resolve, reject) => {
-    db.run("DELETE FROM carts WHERE id = ? AND user_id = ?", [cartId, userId], function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ deleted: this.changes > 0 });
-      }
-    });
-  });
+  try {
+    const stmt = db.prepare("DELETE FROM carts WHERE id = ? AND user_id = ?");
+    const result = stmt.run(cartId, userId);
+    return { deleted: result.changes > 0 };
+  } catch (error) {
+    throw error;
+  }
 }
 
 function updateCartQuantity(cartId, userId, quantity) {
-  return new Promise((resolve, reject) => {
+  try {
     if (quantity <= 0) {
-      removeFromCart(cartId, userId).then(resolve).catch(reject);
+      return removeFromCart(cartId, userId);
     } else {
-      db.run("UPDATE carts SET quantity = ? WHERE id = ? AND user_id = ?", [quantity, cartId, userId], function(err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ updated: this.changes > 0 });
-        }
-      });
+      const stmt = db.prepare("UPDATE carts SET quantity = ? WHERE id = ? AND user_id = ?");
+      const result = stmt.run(quantity, cartId, userId);
+      return { updated: result.changes > 0 };
     }
-  });
+  } catch (error) {
+    throw error;
+  }
 }
 
 module.exports = {

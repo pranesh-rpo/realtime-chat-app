@@ -11,38 +11,33 @@ function comparePassword(password, hash) {
   return bcrypt.compare(password, hash);
 }
 
-function registerUser(username, email, password) {
-  return new Promise((resolve, reject) => {
-    hashPassword(password).then(hashedPassword => {
-      db.run("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hashedPassword], function(err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: this.lastID, username, email });
-        }
-      });
-    }).catch(reject);
-  });
+async function registerUser(username, email, password) {
+  try {
+    const hashedPassword = await hashPassword(password);
+    const insert = db.prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+    const result = insert.run(username, email, hashedPassword);
+    return { id: result.lastInsertRowid, username, email };
+  } catch (error) {
+    throw error;
+  }
 }
 
-function authenticateUser(email, password) {
-  return new Promise((resolve, reject) => {
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-      if (err) {
-        reject(err);
-      } else if (!user) {
-        resolve(null);
-      } else {
-        comparePassword(password, user.password).then(isValid => {
-          if (isValid) {
-            resolve({ id: user.id, username: user.username, email: user.email });
-          } else {
-            resolve(null);
-          }
-        }).catch(reject);
-      }
-    });
-  });
+async function authenticateUser(email, password) {
+  try {
+    const stmt = db.prepare("SELECT * FROM users WHERE email = ?");
+    const user = stmt.get(email);
+    if (!user) {
+      return null;
+    }
+    const isValid = await comparePassword(password, user.password);
+    if (isValid) {
+      return { id: user.id, username: user.username, email: user.email };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function login(req, res) {

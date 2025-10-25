@@ -1,7 +1,7 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 const dbPath = process.env.NODE_ENV === 'production' ? ':memory:' : './chat.db';
-const db = new sqlite3.Database(dbPath);
+const db = new Database(dbPath);
 
 // Create tables if they don't exist
 db.serialize(() => {
