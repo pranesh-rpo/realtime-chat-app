@@ -145,3 +145,6 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Chat app running on http://localhost:${PORT}`);
 });
+
+// Export for deployment platforms that require it
+module.exports = server;
